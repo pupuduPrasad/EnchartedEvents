@@ -10,40 +10,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class UserModel {
-    public static UserDto authenticateUser(String username, String password) {
-        try {
-            ResultSet resultSet = CrudUtil.execute("SELECT * FROM user WHERE userName = ? AND password = ?", username, password);
-            if (resultSet.next()) {
-                String dbUserName = resultSet.getString("userName");
-                String dbPassword = resultSet.getString("password");
-                return new UserDto(dbUserName, dbPassword);
+
+    public ArrayList<UserDto> getAllUserNames() throws SQLException {
+            ResultSet rst = CrudUtil.execute("select * from user");
+
+            ArrayList<UserDto> userDtos = new ArrayList<>();
+
+            while (rst.next()) {
+                UserDto userDto = new UserDto(rst.getString(1), rst.getString(2));
+                userDtos.add(userDto);
             }
-        } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            return userDtos;
         }
-        return null;
-    }
-
-    public ArrayList<String> getAllUserNames() throws SQLException {
-        ResultSet rst = CrudUtil.execute("select userName from user");
-
-        ArrayList<String> userNames = new ArrayList<>();
-
-        while (rst.next()) {
-            userNames.add(rst.getString(1));
-        }
-
-        return userNames;
-    }
-
-    public UserDto findByUsername(String selectedUserName) throws SQLException {
-        ResultSet rst = CrudUtil.execute("select * from user where userName=?", selectedUserName);
-
-        if (rst.next()) {
-            return new UserDto(rst.getString(1), rst.getString(2));
-        }
-        return null;
-    }
 
     public boolean deleteUser(String selectedUsername) throws SQLException {
         return CrudUtil.execute("delete from user where userName=?", selectedUsername);
